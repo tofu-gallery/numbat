@@ -1,0 +1,33 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export const __wbg_commandresult_free: (a: number, b: number) => void;
+export const __wbg_get_commandresult_is_command: (a: number) => number;
+export const __wbg_get_commandresult_should_clear: (a: number) => number;
+export const __wbg_get_commandresult_should_reset: (a: number) => number;
+export const __wbg_interpreteroutput_free: (a: number, b: number) => void;
+export const __wbg_numbat_free: (a: number, b: number) => void;
+export const __wbg_set_commandresult_is_command: (a: number, b: number) => void;
+export const __wbg_set_commandresult_should_clear: (a: number, b: number) => void;
+export const __wbg_set_commandresult_should_reset: (a: number, b: number) => void;
+export const commandresult_output: (a: number) => [number, number];
+export const interpreteroutput_output: (a: number) => [number, number];
+export const numbat_get_completions_for: (a: number, b: number, c: number) => [number, number];
+export const numbat_get_unicode_completion: (a: number, b: number, c: number) => [number, number];
+export const numbat_help: (a: number) => any;
+export const numbat_interpret: (a: number, b: number, c: number) => number;
+export const numbat_new: (a: number, b: number, c: number) => number;
+export const numbat_print_info: (a: number, b: number, c: number) => any;
+export const numbat_set_exchange_rates: (a: number, b: number, c: number) => void;
+export const numbat_try_run_command: (a: number, b: number, c: number) => number;
+export const setup_panic_hook: () => void;
+export const __wbg_set_interpreteroutput_is_error: (a: number, b: number) => void;
+export const __wbg_get_interpreteroutput_is_error: (a: number) => number;
+export const __wbindgen_free: (a: number, b: number, c: number) => void;
+export const __wbindgen_exn_store: (a: number) => void;
+export const __externref_table_alloc: () => number;
+export const __wbindgen_export_3: WebAssembly.Table;
+export const __wbindgen_malloc: (a: number, b: number) => number;
+export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+export const __externref_drop_slice: (a: number, b: number) => void;
+export const __wbindgen_start: () => void;
