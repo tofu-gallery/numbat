@@ -11,10 +11,13 @@ cd "$(dirname "$0")/.."
 (cd numbat-wasm && bash build.sh)
 
 # 2. The site is upstream's www/ folder, which is what numbat.dev serves, minus its .gitignore files
-#    (wasm-pack writes pkg/.gitignore containing "*", which would keep the build out of git).
+#    (wasm-pack writes pkg/.gitignore containing "*", which would keep the build out of git) and minus the
+#    npm packaging of its two wasm-pack packages (pkg/, built above, and articles/pkg/, which upstream
+#    commits): the TypeScript declarations (*.d.ts) and package.json. The pages load neither, and Tofu's
+#    static hosting refuses a site that contains them.
 rm -rf site
 mkdir site
-rsync -a --exclude '.gitignore' numbat-wasm/www/ site/
+rsync -a --exclude '.gitignore' --exclude '*.d.ts' --exclude 'package.json' numbat-wasm/www/ site/
 
 # 3. Exchange rates from a source that any address may read (TOFU.md, "What we changed").
 node tofu/patch-exchange-rates.mjs site/index.js

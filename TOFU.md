@@ -40,8 +40,15 @@ No upstream file is edited. Every change is a new file on the `tofu` branch:
    (`wasm-pack build --target=web --out-dir=www/pkg` with `RUSTFLAGS='--cfg getrandom_backend="wasm_js"'`),
    then copies `numbat-wasm/www/`, the folder upstream publishes as numbat.dev, to `site/`. It leaves out
    the `.gitignore` files (wasm-pack writes `pkg/.gitignore` containing `*`, which would keep the build out
-   of git), applies the change below to `site/index.js`, and puts copies of `LICENSE-MIT` and
-   `LICENSE-APACHE` in `site/`.
+   of git) and the npm packaging of the site's two WebAssembly packages, `pkg/` (built here) and
+   `articles/pkg/` (which upstream commits): their TypeScript declarations (`numbat_wasm.d.ts`,
+   `numbat_wasm_bg.wasm.d.ts`) and their `package.json`. The pages load none of these six files, and Tofu's
+   Free plan serves a finished site from its static hosting only when every file is a type that hosting
+   serves and nothing looks like build configuration: it refuses `.d.ts` files and reads a `package.json`
+   as a build to run. The two `package.json` files held only wasm-pack's package facts (name `numbat-wasm`,
+   version 0.1.0, collaborator David Peter, the list of files) and no licence field. The script then
+   applies the change below to `site/index.js` and puts copies of `LICENSE-MIT` and `LICENSE-APACHE` in
+   `site/`.
 2. **`tofu/patch-exchange-rates.mjs`: exchange rates that any address can read.** Upstream's page asks
    `https://numbat.dev/ecb-exchange-rates.php` for the European Central Bank's reference rates. Neither that
    address nor the ECB's own feed (`https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml`) sends a
@@ -57,11 +64,13 @@ No upstream file is edited. Every change is a new file on the `tofu` branch:
    starts anyway and loads the currency units without rates. The rewritten file begins with a notice saying
    what was changed, when, and where the original is (Apache License 2.0, section 4(b)). If upstream changes
    `fetch_exchange_rates()`, the script stops with an error instead of building a site without the change.
-3. **`site/`.** The verified build for this pin: 35 files, 5.2 MB. It is upstream's `numbat-wasm/www/` (the
-   calculator page, its styles and scripts, jQuery and jQuery Terminal, the logo and icons,
-   `opensearch.xml`, and `articles/` with the article's own prebuilt WebAssembly package, which upstream
-   commits), plus the freshly built `pkg/` (`numbat_wasm_bg.wasm`, 1,896,505 bytes) and the two licence
-   files.
+3. **`site/`.** The verified build for this pin: 29 files, 5,310,415 bytes. It is upstream's
+   `numbat-wasm/www/` (the calculator page, its styles and scripts, jQuery and jQuery Terminal, the logo and
+   icons, `opensearch.xml`, and `articles/` with the article's own prebuilt WebAssembly package, which
+   upstream commits), plus the freshly built `pkg/` (`numbat_wasm_bg.wasm`, 1,896,505 bytes) and the two
+   licence files, without the six npm packaging files described in item 1. The first pin,
+   `pin/2026-10-23`, still had those six (35 files); `pin/2026-10-23.1` removed them from `site/` and from
+   the script, and changed nothing else in the site.
 4. **`TOFU.md`.** This file.
 
 To move to a newer upstream commit: merge upstream's `main` into `tofu`, run `bash tofu/build-site.sh`,
@@ -104,7 +113,8 @@ needs a key.
   `e8abf32b975fb03d5a554f5e7141cd50ae63e88d` (2026-10-11, "Deployment via nix"; the `numbat` crate is
   version 1.24.0).
 - Fork: <https://github.com/tofu-gallery/numbat>. Its `main` mirrors upstream untouched; the adaptations are
-  on `tofu`, and the gallery pins the tag `pin/2026-10-23`.
+  on `tofu`, and each pin is a tag on it: `pin/2026-10-23` first, then `pin/2026-10-23.1`, the same build
+  without the six files Tofu's Free plan refused (item 1 above).
 - Licence: MIT OR Apache-2.0, at your option (the `license` field of upstream's crates). "Copyright (c)
   2022-2024 David Peter, and all Numbat contributors". `LICENSE-MIT` and `LICENSE-APACHE` are unchanged, and
   `site/` carries byte-identical copies. Upstream has no NOTICE file. `site/index.js` is the one modified
@@ -126,9 +136,12 @@ needs a key.
   installs a custom logger calling `rand::rng()`; the web build installs no logger. The others are in the
   command-line tool, the documentation build, the fuzzing harness and the VS Code extension, none of which
   are in `site/`.
-- No copyleft source offer is needed. The exact source of this build is this fork at `pin/2026-10-23`.
+- No copyleft source offer is needed. The exact source of this build is this fork at `pin/2026-10-23.1`
+  (the WebAssembly file is the one built for `pin/2026-10-23`, unchanged).
 
 ## Verification
+
+### `pin/2026-10-23`: the build
 
 Run on 2026-10-23 on macOS (arm64) with rustc 1.98.1, wasm-pack 0.15.0 (installed with
 `cargo install --locked --root <tools folder> wasm-pack`), Node 22.22.3 and Python 3. No app was deployed.
