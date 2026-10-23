@@ -186,3 +186,38 @@ A browser run (Chromium, driven by Aside) against 127.0.0.1 only:
   entered through the terminal's own `exec()` log nothing, so this is the test tool, not the app.
 
 Upstream's tests (`cargo test`, `numbat-wasm/test.sh`) were not run: no Rust file was changed.
+
+### `pin/2026-10-23.1`: without the six refused files
+
+Run on 2026-10-23 on the same machine. The WebAssembly was not rebuilt: no Rust file and no build input
+changed, only which files are copied into `site/`.
+
+```sh
+bash -n tofu/build-site.sh                                             # OK
+# The copy step alone: the script's new rsync line, run over pin/2026-10-23's site/ (with the .gitignore
+# files put back), gave exactly the new site/ (diff -r: no difference; 29 files).
+# Tofu's own predicates (the GitHub import's snapshot, the static hosting's checks, the safety check), run
+# against the pushed tofu branch at 15188b55 (this section changes only TOFU.md, outside site/):
+#   numbat tofu root=site detect=static files=29 published=25 -> static (finished site) | safety ok (1 findings)
+# The same check on pin/2026-10-23 printed: not on the static lane | refused: type×4, configuration×2
+python3 -I simulate_import.py --one tofu-gallery/numbat tofu site yes
+# root=site container=False kept=29 dropped=0, and no page loads a file the import drops
+```
+
+The static hosting serves 25 of the 29 files. The other four are the two `README.md` files and the two
+licence files, which it keeps with the app's code as the repository's own documents and does not serve. The
+`tofu` branch's archive before this section was added measured 3,603,790 bytes compressed, 615 files and
+10,849,887 bytes unpacked.
+
+A browser run (Chromium, driven by Aside) against a copy of `site/` filtered as the importer filters, served
+with `python3 -I -m http.server` on 127.0.0.1 only:
+
+- The calculator was ready 1.4 s after loading. Typing `1 m + 2 cm` and Enter (real key events, which carry
+  their `key`, so the TypeError above did not appear) gave `= 102 cm [Length]`, and the address became
+  `?q=1+m+%2B+2+cm%E2%8F%8E`. No console errors. Every request to the copy answered 200 (304 when the browser
+  revalidated its cache), `pkg/numbat_wasm.js` and `pkg/numbat_wasm_bg.wasm` included, and
+  api.frankfurter.dev answered 200.
+- The article: all six outputs filled in on load (the first, `3 months + 2 years`, gave `= 27 month
+  [Time]`), with no console errors; `articles/pkg/numbat_wasm.js` and its `.wasm` answered 200, and its
+  three Google Fonts loaded. The one 404 was the browser's own request for `/favicon.ico`, which the article
+  does not link, as upstream.
